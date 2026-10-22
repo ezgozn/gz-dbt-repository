@@ -9,7 +9,7 @@ source as (
 renamed as (
 
     select
-        date_date,
+        CAST(date_date AS DATE) as date_date,
         orders_id as order_id,
         pdt_id as product_id,
         revenue,

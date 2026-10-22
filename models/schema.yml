@@ -7,20 +7,40 @@ sources:
     tables:
       - name: sales
         identifier: raw_gz_sales
-        description: sales data for greenweez
+        description: sales of Greenweez / we have one row per product_id found in each orders_id
         columns:
+        - name: date_date
+          description: date of purchase
+        - name: revenue
+          description: the amount paid by the customer to purchase the product. revenue = quantity * selling_price
+        - name: quantity
+          description: the quantity of products purchased for a given order
         - name: orders_id
-          description: primary key for the order
+          description: foreign key to ship
           tests:
             - not_null
         - name: pdt_id
-          description: id of the product in a given order
+          description: id of the product in a given order, foreign key to product
           tests:
             - not_null
-
+        # Freshness testing
+        config:
+          loaded_at_field: CAST(date_date AS TIMESTAMP)
+          freshness:
+            warn_after:
+              count: 30
+              period: day
+            # error_after:
+            #  count: 90
+            #  period: day
         tests:
           - unique:
-              column_name: "orders_id || '-' || pdt_id"  
+              column_name: "orders_id || '-' || pdt_id"
+          # - dbt_utils.unique_combination_of_columns:
+          #     arguments:
+          #       combination_of_columns:
+          #       - orders_id
+          #      - pdt_id
 
       - name: products
         identifier: raw_gz_product
@@ -31,7 +51,8 @@ sources:
             tests:
               - unique
               - not_null
-              
+          - name: purchase_price
+            description: the purchase price of the product
       - name: ship
         identifier: raw_gz_ship
         description: shipment costs for orders
@@ -41,6 +62,11 @@ sources:
             tests:
               - unique
               - not_null
-            
+          - name: shipping_fee
+            description: the price the customer pays for shipping
+          - name: log_cost
+            description: the cost of preparing the parcel in the distribution centre/warehouse
+          - name: ship_cost
+            description: shipping cost paid by Greenweez to the carrier/logistics provider
               
             
