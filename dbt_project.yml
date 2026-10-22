@@ -37,6 +37,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   my_new_project:
-    # Applies to all files under models/example/
-    example:
+    staging:
+      +materialized: view         # Fast to build, always real-time
+    intermediate:
+      +materialized: ephemeral    # Inlined as CTEs, keeps warehouse clean
+    mart:
       +materialized: table
+      finance:                 # mart/finance klasörünü hedefler
+        +schema: finance       # Bu klasör altındakiler 'finance' şemasına gitsin
