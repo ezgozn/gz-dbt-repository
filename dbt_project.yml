@@ -35,3 +35,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 # continue to be built as views. These settings can be overridden in the individual model files
 # using the `{{ config(...) }}` macro.
 
+models:
+  my_new_project:
+    staging:
+      +materialized: view         # Fast to build, always real-time
+    intermediate:
+      +materialized: ephemeral    # Inlined as CTEs, keeps warehouse clean
+    mart:
+      +materialized: table
+      finance:                 # mart/finance klasörünü hedefler
+        +schema: finance       # Bu klasör altındakiler 'finance' şemasına gitsin
